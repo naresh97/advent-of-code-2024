@@ -32,14 +32,13 @@ fn part1() -> usize {
     let backwards_diagonal = rows
         .windows(4)
         .filter_map(|blocks| {
-            let mut a = blocks[0].iter();
+            let a = blocks[0].iter();
             let mut b = blocks[1].iter();
             let mut c = blocks[2].iter();
             let mut d = blocks[3].iter();
-            a.advance_by(0).ok()?;
-            b.advance_by(1).ok()?;
-            c.advance_by(2).ok()?;
-            d.advance_by(3).ok()?;
+            b.next()?;
+            c.nth(1)?;
+            d.nth(2)?;
 
             let iter = a.zip(b);
             let iter = iter.zip(c);
@@ -56,11 +55,10 @@ fn part1() -> usize {
             let mut a = blocks[0].iter();
             let mut b = blocks[1].iter();
             let mut c = blocks[2].iter();
-            let mut d = blocks[3].iter();
-            a.advance_by(3).ok()?;
-            b.advance_by(2).ok()?;
-            c.advance_by(1).ok()?;
-            d.advance_by(0).ok()?;
+            let d = blocks[3].iter();
+            a.nth(2)?;
+            b.nth(1)?;
+            c.next()?;
 
             let iter = a.zip(b);
             let iter = iter.zip(c);
@@ -89,20 +87,18 @@ fn part2() -> usize {
     let total = rows
         .windows(3)
         .filter_map(|blocks| {
-            let mut a = blocks[0].iter();
-            a.advance_by(0).ok()?;
+            let a = blocks[0].iter();
             let mut b = blocks[1].iter();
-            b.advance_by(1).ok()?;
+            b.next()?;
             let mut c = blocks[2].iter();
-            c.advance_by(2).ok()?;
+            c.nth(1)?;
             let forward_diagonal = a.zip(b).zip(c).map(|((a, b), c)| [*a, *b, *c]);
 
             let mut a = blocks[0].iter();
-            a.advance_by(2).ok()?;
+            a.nth(1)?;
             let mut b = blocks[1].iter();
-            b.advance_by(1).ok()?;
-            let mut c = blocks[2].iter();
-            c.advance_by(0).ok()?;
+            b.next()?;
+            let c = blocks[2].iter();
             let backward_diagonal = a.zip(b).zip(c).map(|((a, b), c)| [*a, *b, *c]);
 
             Some(forward_diagonal.zip(backward_diagonal))

@@ -1,5 +1,3 @@
-#![feature(iter_advance_by)]
-
 use day1::day1;
 use day2::day2;
 use day3::day3;
