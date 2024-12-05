@@ -61,11 +61,10 @@ fn is_update_correct(update: &[usize], rules: &[(usize, usize)]) -> Result<(), (
 }
 
 fn get_input() -> (Vec<(usize, usize)>, Vec<Vec<usize>>) {
-    let input = INPUT.split("\r\n\r\n").collect::<Vec<_>>();
-
-    let rules = input[0];
-    let rules = rules
-        .split("\r\n")
+    let position = INPUT.lines().position(|x| x.is_empty()).unwrap();
+    let lines = INPUT.lines().collect::<Vec<_>>();
+    let rules = lines[..position]
+        .iter()
         .filter_map(|rule| {
             let mut rule = rule.split("|");
             let lhs = rule.next()?.parse::<usize>().ok()?;
@@ -74,9 +73,8 @@ fn get_input() -> (Vec<(usize, usize)>, Vec<Vec<usize>>) {
         })
         .collect::<Vec<_>>();
 
-    let updates = input[1];
-    let updates = updates
-        .split("\r\n")
+    let updates = lines[position..]
+        .iter()
         .filter_map(|pages| {
             pages
                 .split(",")

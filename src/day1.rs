@@ -32,7 +32,7 @@ fn part2() -> usize {
 fn get_input() -> (Vec<i32>, Vec<i32>) {
     const INPUT: &str = include_str!("../inputs/day1.txt");
     let input: (Vec<_>, Vec<_>) = INPUT
-        .split("\n")
+        .lines()
         .filter_map(|lines| {
             let mut lines = lines.split_ascii_whitespace();
             let a = lines.next().and_then(|a| a.parse::<i32>().ok())?;

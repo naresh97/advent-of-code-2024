@@ -1,10 +1,11 @@
 pub fn day4() {
     part1();
+    part2();
 }
 
 fn part1() -> usize {
     let rows = INPUT
-        .split("\n")
+        .lines()
         .filter(|row| !row.is_empty())
         .map(|row| row.chars().collect::<Vec<_>>())
         .collect::<Vec<_>>();
@@ -76,7 +77,7 @@ fn part1() -> usize {
 
 fn part2() -> usize {
     let rows = INPUT
-        .split("\n")
+        .lines()
         .filter(|row| !row.is_empty())
         .map(|row| row.chars().collect::<Vec<_>>())
         .collect::<Vec<_>>();

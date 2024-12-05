@@ -84,7 +84,7 @@ fn is_record_safe(record: &[i32]) -> Result<(), usize> {
 fn get_input() -> Vec<Vec<i32>> {
     const INPUT: &str = include_str!("../inputs/day2.txt");
     INPUT
-        .split("\n")
+        .lines()
         .map(|line| {
             line.split_ascii_whitespace()
                 .filter_map(|x| x.parse::<i32>().ok())
