@@ -13,7 +13,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    environment: Build
     env:
       ENC_KEY: ${{ secrets.ENC_KEY }}
 
