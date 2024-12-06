@@ -14,13 +14,14 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      ENC_KEY: ${{ secrets.ENC_KEY }}
+
     steps:
     - uses: actions/checkout@v4
     - name: Build
-      env:
-        ENC_KEY: ${{ secrets.ENC_KEY }}
+      if: ${{ env.ENC_KEY != '' }}
       run: cargo build --verbose
     - name: Run tests
-      env:
-        ENC_KEY: ${{ secrets.ENC_KEY }}
+      if: ${{ env.ENC_KEY != '' }}
       run: cargo test --verbose
