@@ -1,0 +1,27 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    environment: Build
+    env:
+      ENC_KEY: ${{ secrets.ENC_KEY }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build
+      if: ${{ env.ENC_KEY != '' }}
+      run: cargo build --verbose
+    - name: Run tests
+      if: ${{ env.ENC_KEY != '' }}
+      run: cargo test --verbose
