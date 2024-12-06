@@ -1,3 +1,5 @@
+use encryption::include_encrypted_string;
+
 pub fn day3() {
     part1();
     part2();
@@ -116,7 +118,7 @@ fn parse(chars: &[char]) -> (usize, usize) {
     (total_enabled, total_disabled)
 }
 
-const INPUT: &str = include_str!("../inputs/day3.txt");
+const INPUT: &str = include_encrypted_string!("inputs/day3.enc");
 
 #[cfg(test)]
 mod tests {

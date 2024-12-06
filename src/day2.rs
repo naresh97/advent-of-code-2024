@@ -1,5 +1,7 @@
 use std::cmp::Ordering;
 
+use encryption::include_encrypted_string;
+
 pub fn day2() {
     part1();
     part2();
@@ -82,7 +84,7 @@ fn is_record_safe(record: &[i32]) -> Result<(), usize> {
 }
 
 fn get_input() -> Vec<Vec<i32>> {
-    const INPUT: &str = include_str!("../inputs/day2.txt");
+    const INPUT: &str = include_encrypted_string!("inputs/day2.enc");
     INPUT
         .lines()
         .map(|line| {

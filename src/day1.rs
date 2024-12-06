@@ -1,3 +1,5 @@
+use encryption::include_encrypted_string;
+
 pub fn day1() {
     part1();
     part2();
@@ -30,7 +32,7 @@ fn part2() -> usize {
 }
 
 fn get_input() -> (Vec<i32>, Vec<i32>) {
-    const INPUT: &str = include_str!("../inputs/day1.txt");
+    const INPUT: &str = include_encrypted_string!("inputs/day1.enc");
     let input: (Vec<_>, Vec<_>) = INPUT
         .lines()
         .filter_map(|lines| {

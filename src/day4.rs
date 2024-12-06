@@ -1,3 +1,5 @@
+use encryption::include_encrypted_string;
+
 pub fn day4() {
     part1();
     part2();
@@ -116,7 +118,7 @@ fn part2() -> usize {
     total
 }
 
-const INPUT: &str = include_str!("../inputs/day4.txt");
+const INPUT: &str = include_encrypted_string!("inputs/day4.enc");
 
 #[cfg(test)]
 mod tests {

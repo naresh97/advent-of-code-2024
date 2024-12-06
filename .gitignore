@@ -1,2 +1,4 @@
-/target
-inputs/
+target/
+inputs/*
+!inputs/*.enc
+!inputs/nonce.txt

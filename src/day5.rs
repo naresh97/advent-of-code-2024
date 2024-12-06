@@ -1,3 +1,5 @@
+use encryption::include_encrypted_string;
+
 pub fn day5() {
     part1();
     part2();
@@ -86,7 +88,7 @@ fn get_input() -> (Vec<(usize, usize)>, Vec<Vec<usize>>) {
 
     (rules, updates)
 }
-const INPUT: &str = include_str!("../inputs/day5.txt");
+const INPUT: &str = include_encrypted_string!("inputs/day5.enc");
 
 #[cfg(test)]
 mod tests {
