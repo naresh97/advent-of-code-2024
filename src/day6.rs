@@ -27,30 +27,55 @@ fn part1() -> usize {
 
 fn part2() -> usize {
     let (map, position) = get_input(INPUT);
-    let mut obstacles = 0;
-    for (row_idx, row) in map.iter().enumerate() {
-        for (col_idx, _col) in row.iter().enumerate() {
-            let mut map = map.clone();
-            let mut position = position.clone();
-            map[row_idx][col_idx] = MapItem::Obstacle;
-            let mut positions = HashSet::new();
-            loop {
-                while facing_type(&map, &position) == MapItem::Obstacle {
-                    turn(&mut position);
-                }
-                if facing_type(&map, &position) == MapItem::Outside {
-                    break;
-                }
-                move_forward(&mut position);
-                if positions.contains(&position) {
-                    obstacles += 1;
-                    break;
-                }
-                positions.insert(position.clone());
+
+    enum Ending {
+        Outside,
+        Loop,
+    }
+
+    fn get_positions(
+        map: Vec<Vec<MapItem>>,
+        mut position: Position,
+    ) -> (HashSet<Position>, Ending) {
+        let mut positions = HashSet::new();
+        loop {
+            while facing_type(&map, &position) == MapItem::Obstacle {
+                turn(&mut position);
             }
+            if facing_type(&map, &position) == MapItem::Outside {
+                return (positions, Ending::Outside);
+            }
+            move_forward(&mut position);
+            if positions.contains(&position) {
+                return (positions, Ending::Loop);
+            }
+            positions.insert(position.clone());
         }
     }
-    println!("DAY2 PART2: {obstacles}");
+
+    let mut obstacles = HashSet::new();
+    let (original_positions, _) = get_positions(map.clone(), position.clone());
+    for Position {
+        row,
+        col,
+        direction: _,
+    } in original_positions
+    {
+        if (row, col) == (position.row, position.col) {
+            continue;
+        }
+        if obstacles.contains(&(row, col)) {
+            continue;
+        }
+        let mut map = map.clone();
+        map[row][col] = MapItem::Obstacle;
+        let (_, ending) = get_positions(map, position.clone());
+        if matches!(ending, Ending::Loop) {
+            obstacles.insert((row, col));
+        }
+    }
+    let obstacles = obstacles.len();
+    println!("DAY6 PART2: {obstacles}");
     obstacles
 }
 
