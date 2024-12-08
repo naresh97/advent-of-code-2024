@@ -1,5 +1,3 @@
-use std::cmp::Ordering;
-
 use encryption::include_encrypted_string;
 
 pub fn day7() {
@@ -7,111 +5,83 @@ pub fn day7() {
     part2();
 }
 
+#[derive(Clone, Copy)]
+struct UseConcat(bool);
+
 fn part1() -> usize {
     let equations = get_inputs(INPUT);
     let mut total = 0;
-    'equation_loop: for equation in equations {
-        let mut operators = gen_operators(equation.operands.len() - 1, 2);
-        loop {
-            if matches!(check_target(&operators, &equation), Ordering::Equal) {
-                total += equation.target;
-                continue 'equation_loop;
-            }
-            if is_fully_reduced(&operators) {
-                break;
-            }
-            reduce_operators(&mut operators);
-        }
-    }
-    println!("DAY7 PART1: {total}");
-    total
-}
-fn part2() -> usize {
-    let equations = get_inputs(INPUT);
-    let mut total = 0;
-    'equation_loop: for equation in equations {
-        let mut operators = gen_operators(equation.operands.len() - 1, 3);
-        loop {
-            if matches!(check_target(&operators, &equation), Ordering::Equal) {
-                total += equation.target;
-                continue 'equation_loop;
-            }
-            if is_fully_reduced(&operators) {
-                break;
-            }
-            reduce_operators(&mut operators);
+    for equation in equations {
+        let operands = equation.operands.iter().rev().copied();
+        let target = equation.target;
+        if check(operands.clone(), target, UseConcat(false)) {
+            total += equation.target;
         }
     }
     println!("DAY7 PART2: {total}");
     total
 }
 
-struct Operators {
-    len: usize,
-    dim: usize,
-    val: usize,
-}
-impl Operators {
-    fn gen(len: usize, dim: usize) -> Self {
-        let val = dim.pow(len as u32) - 1;
-        Self { len, dim, val }
-    }
-    fn sub(&mut self) {
-        self.val -= 1;
-    }
-    fn get_iter(&self) -> impl Iterator<Item = usize> {
-        let mut x = vec![0; self.len];
-        let mut tmp = self.val;
-        let mut i = 0;
-        while tmp != 0 {
-            let rem = tmp % self.dim;
-            x[i] = rem;
-            tmp /= self.dim;
-            i += 1;
+fn part2() -> usize {
+    let equations = get_inputs(INPUT);
+    let mut total = 0;
+    for equation in equations {
+        let operands = equation.operands.iter().rev().copied();
+        let target = equation.target;
+        if check(operands.clone(), target, UseConcat(true)) {
+            total += equation.target;
         }
-        x.reverse();
-        x.into_iter()
     }
+    println!("DAY7 PART2: {total}");
+    total
 }
 
-fn gen_operators(len: usize, dim: usize) -> Operators {
-    Operators::gen(len, dim)
-}
+fn check(
+    ori_operands: impl Iterator<Item = usize> + Clone,
+    mut target: usize,
+    use_concat: UseConcat,
+) -> bool {
+    let operands = ori_operands.clone();
+    let len = ori_operands.clone().count();
+    for (i, current_operand) in operands.enumerate() {
+        if target == current_operand && i + 1 == len {
+            return true;
+        }
+        let is_multiple = target % current_operand == 0;
+        let is_concat = ends_with(target, current_operand) && use_concat.0;
 
-fn is_fully_reduced(operators: &Operators) -> bool {
-    operators.val == 0
-}
+        if is_multiple {
+            let mut operands = ori_operands.clone();
+            let current_operand = operands.nth(i).unwrap();
+            let new_target = target / current_operand;
+            if check(operands.clone(), new_target, use_concat) {
+                return true;
+            }
+        }
+        if is_concat {
+            let mut operands = ori_operands.clone();
+            let current_operand = operands.nth(i).unwrap();
+            let new_target = deconcat(target, current_operand);
+            if check(operands.clone(), new_target, use_concat) {
+                return true;
+            }
+        }
 
-fn reduce_operators(operators: &mut Operators) {
-    operators.sub();
-}
-
-fn check_target(operators: &Operators, equation: &Equation) -> Ordering {
-    let Equation { target, operands } = equation;
-    let mut operands = operands.iter();
-
-    let mut total = *operands.next().unwrap();
-
-    let mut operators = operators.get_iter();
-
-    for next_operand in operands {
-        let sum = match operators.next().unwrap() {
-            0 => total + *next_operand,
-            1 => total * *next_operand,
-            2 => concat(total, *next_operand),
-            _ => unreachable!(),
+        target = match target.checked_sub(current_operand) {
+            Some(t) => t,
+            None => return false,
         };
-        if sum > *target {
-            return Ordering::Greater;
-        }
-        total = sum;
     }
-    total.cmp(target)
+    false
 }
 
-fn concat(lhs: usize, rhs: usize) -> usize {
-    let lhs = 10_usize.pow(digits(rhs) as u32) * lhs;
-    lhs + rhs
+fn deconcat(mut lhs: usize, rhs: usize) -> usize {
+    lhs /= 10_usize.pow(digits(rhs) as u32);
+    lhs
+}
+
+fn ends_with(lhs: usize, rhs: usize) -> bool {
+    lhs % 10_usize.pow(digits(rhs) as u32) == rhs
 }
 
 fn digits(mut num: usize) -> usize {
@@ -169,8 +139,10 @@ mod tests {
     }
 
     #[test]
-    fn concat_test() {
-        assert_eq!(12345, concat(123, 45));
-        assert_eq!(2286, concat(2, 286));
+    fn ends_with_test() {
+        assert!(ends_with(12345, 45));
+        assert!(ends_with(12345, 5));
+        assert!(ends_with(12345, 345));
+        assert!(!ends_with(12345, 111));
     }
 }
