@@ -7,6 +7,7 @@ use day4::day4;
 use day5::day5;
 use day6::day6;
 use day7::day7;
+use day8::day8;
 
 mod day1;
 mod day2;
@@ -15,6 +16,7 @@ mod day4;
 mod day5;
 mod day6;
 mod day7;
+mod day8;
 
 fn main() {
     time_run(day1);
@@ -24,6 +26,7 @@ fn main() {
     time_run(day5);
     time_run(day6);
     time_run(day7);
+    time_run(day8);
 }
 
 fn time_run(f: impl Fn()) {
