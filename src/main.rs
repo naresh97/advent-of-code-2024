@@ -1,24 +1,24 @@
 use std::time::Instant;
 
-use day1::day1;
-use day2::day2;
-use day3::day3;
-use day4::day4;
-use day5::day5;
-use day6::day6;
-use day7::day7;
-use day8::day8;
-use day9::day9;
+use day01::day1;
+use day02::day2;
+use day03::day3;
+use day04::day4;
+use day05::day5;
+use day06::day6;
+use day07::day7;
+use day08::day8;
+use day09::day9;
 
-mod day1;
-mod day2;
-mod day3;
-mod day4;
-mod day5;
-mod day6;
-mod day7;
-mod day8;
-mod day9;
+mod day01;
+mod day02;
+mod day03;
+mod day04;
+mod day05;
+mod day06;
+mod day07;
+mod day08;
+mod day09;
 
 fn main() {
     time_run(day1);
