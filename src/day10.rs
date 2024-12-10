@@ -19,35 +19,17 @@ fn part1() -> usize {
         .map(|(coord, _)| *coord)
         .collect::<Vec<_>>();
 
-    trailheads
+    let total = trailheads
         .into_iter()
-        .map(|start| climb_1(start, &height_map, map_size).len())
-        .sum()
-}
-
-fn climb_1(coord: Coord, height_map: &HashMap<Coord, usize>, map_size: MapSize) -> HashSet<Coord> {
-    let Some(coord_height) = height_map.get(&coord).copied() else {
-        return HashSet::new();
-    };
-
-    let neighbours = get_neighbours(coord, height_map, map_size);
-
-    if coord_height == 8 {
-        let summits = neighbours
-            .iter()
-            .filter(|(_, val)| **val == 9)
-            .map(|(coord, _)| *coord)
-            .collect::<HashSet<_>>();
-        if !summits.is_empty() {
-            return summits;
-        }
-    }
-
-    neighbours
-        .iter()
-        .filter(|(_, val)| **val == coord_height + 1)
-        .flat_map(|(coord, _)| climb_1(*coord, height_map, map_size))
-        .collect::<HashSet<_>>()
+        .map(|start| {
+            climb(start, &height_map, map_size)
+                .iter()
+                .collect::<HashSet<_>>()
+                .len()
+        })
+        .sum();
+    println!("DAY10 PART1: {total}");
+    total
 }
 
 fn part2() -> usize {
@@ -59,15 +41,17 @@ fn part2() -> usize {
         .map(|(coord, _)| *coord)
         .collect::<Vec<_>>();
 
-    trailheads
+    let total = trailheads
         .into_iter()
-        .map(|start| climb_2(start, &height_map, map_size))
-        .sum()
+        .map(|start| climb(start, &height_map, map_size).len())
+        .sum();
+    println!("DAY10 PART2: {total}");
+    total
 }
 
-fn climb_2(coord: Coord, height_map: &HashMap<Coord, usize>, map_size: MapSize) -> usize {
+fn climb(coord: Coord, height_map: &HashMap<Coord, usize>, map_size: MapSize) -> Vec<Coord> {
     let Some(coord_height) = height_map.get(&coord).copied() else {
-        return 0;
+        return Vec::new();
     };
 
     let neighbours = get_neighbours(coord, height_map, map_size);
@@ -79,15 +63,15 @@ fn climb_2(coord: Coord, height_map: &HashMap<Coord, usize>, map_size: MapSize) 
             .map(|(coord, _)| *coord)
             .collect::<Vec<_>>();
         if !summits.is_empty() {
-            return summits.len();
+            return summits;
         }
     }
 
     neighbours
         .iter()
         .filter(|(_, val)| **val == coord_height + 1)
-        .map(|(coord, _)| climb_2(*coord, height_map, map_size))
-        .sum()
+        .flat_map(|(coord, _)| climb(*coord, height_map, map_size))
+        .collect::<Vec<_>>()
 }
 
 fn get_neighbours(
