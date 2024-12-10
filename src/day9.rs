@@ -4,8 +4,8 @@ use std::borrow::BorrowMut;
 use encryption::include_encrypted_string;
 
 pub fn day9() {
-    part1();
-    //part2();
+    //part1();
+    part2();
 }
 
 fn part1() -> usize {
@@ -55,9 +55,9 @@ fn part1() -> usize {
     total
 }
 
-fn part2() {
-    let vals = get_input(EXAMPLE);
-    let mut empty_blocks = vals
+fn part2() -> usize {
+    let mut ori_vals = get_input(INPUT);
+    let mut empty_blocks = ori_vals
         .iter()
         .enumerate()
         .collect::<Vec<_>>()
@@ -70,7 +70,7 @@ fn part2() {
         })
         .collect::<Vec<_>>();
     empty_blocks.sort();
-    let vals = vals.iter().enumerate().collect::<Vec<_>>();
+    let vals = ori_vals.iter().enumerate().collect::<Vec<_>>();
     let chunks = vals
         .chunk_by(|a, b| a.1 == b.1)
         .collect::<Vec<_>>()
@@ -96,16 +96,10 @@ fn part2() {
         else {
             continue;
         };
-        println!("Chunk {val} len {chunk_len} inserting into {block_idx}");
+        new_vals.push((block_idx, chunk_len, val));
         empty_blocks.remove(idx);
-        println!("Removing empty block {block_idx} len {block_len}");
         if block_len - chunk_len > 0 {
             empty_blocks.insert(idx, (block_idx + chunk_len, block_len - chunk_len));
-            println!(
-                "Inserting block {} len {}",
-                block_idx + chunk_len,
-                block_len - chunk_len
-            );
         }
 
         let mut extended = false;
@@ -114,7 +108,6 @@ fn part2() {
             .iter_mut()
             .find(|(idx, len)| (*idx..=*idx + *len).contains(&chunk_idx))
         {
-            println!("Extending {idx},{len} to {idx},{}", *len + chunk_len);
             extended = true;
             *len += chunk_len;
             chunk_len = *len;
@@ -135,28 +128,41 @@ fn part2() {
                 if x.0 == chunk_idx {
                     x.1 += a_len;
                     empty_blocks.remove(idx);
-                    println!(
-                        "Extending {chunk_idx},{chunk_len} to {chunk_idx},{}",
-                        chunk_len + a_len
-                    );
                 }
             } else {
                 empty_blocks.remove(idx);
                 empty_blocks.insert(idx, (chunk_idx, chunk_len + a_len));
-                println!(
-                    "Replacing {a_idx},{a_len} with {chunk_idx},{}",
-                    chunk_len + a_len
-                );
             }
         }
         if !extended {
-            println!("Adding {chunk_idx},{chunk_len}");
             empty_blocks.push((chunk_idx, chunk_len));
         }
         empty_blocks.sort();
     }
-    println!("{empty_blocks:?}");
-    todo!()
+    for (idx, len) in empty_blocks {
+        for x in ori_vals.get_mut(idx..idx + len).unwrap() {
+            *x = Val::Empty;
+        }
+    }
+    for (idx, len, val) in new_vals {
+        for x in ori_vals.get_mut(idx..idx + len).unwrap() {
+            *x = Val::Val(val);
+        }
+    }
+
+    let total: usize = ori_vals
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, val)| {
+            if let Val::Val(val) = val {
+                Some(idx * (*val))
+            } else {
+                None
+            }
+        })
+        .sum();
+    println!("DAY9 PART2: {total}");
+    total
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -204,6 +210,6 @@ mod tests {
 
     #[test]
     fn part2_test() {
-        part2();
+        assert_eq!(2858, part2());
     }
 }
