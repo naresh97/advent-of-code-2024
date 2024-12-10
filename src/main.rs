@@ -1,4 +1,3 @@
-#![allow(dead_code, unused_imports)]
 use std::time::Instant;
 
 use day1::day1;
@@ -22,14 +21,14 @@ mod day8;
 mod day9;
 
 fn main() {
-    // time_run(day1);
-    // time_run(day2);
-    // time_run(day3);
-    // time_run(day4);
-    // time_run(day5);
-    // time_run(day6);
-    // time_run(day7);
-    // time_run(day8);
+    time_run(day1);
+    time_run(day2);
+    time_run(day3);
+    time_run(day4);
+    time_run(day5);
+    time_run(day6);
+    time_run(day7);
+    time_run(day8);
     time_run(day9);
 }
 

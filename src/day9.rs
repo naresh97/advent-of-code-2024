@@ -1,10 +1,9 @@
-#![warn(dead_code)]
-use std::borrow::BorrowMut;
+use core::panic;
 
 use encryption::include_encrypted_string;
 
 pub fn day9() {
-    //part1();
+    part1();
     part2();
 }
 
@@ -52,116 +51,47 @@ fn part1() -> usize {
         })
         .sum();
 
+    println!("DAY9 PART1 {total}");
+
     total
 }
 
 fn part2() -> usize {
-    let mut ori_vals = get_input(INPUT);
-    let mut empty_blocks = ori_vals
-        .iter()
-        .enumerate()
-        .collect::<Vec<_>>()
+    let input = get_input(INPUT).into_iter().enumerate().collect::<Vec<_>>();
+    let input = input
         .chunk_by(|a, b| a.1 == b.1)
-        .filter(|x| matches!(x.first().map(|x| { x.1 }), Some(Val::Empty)))
-        .map(|x| {
-            let len = x.len();
-            let idx = x.first().unwrap().0;
-            (idx, len)
+        .filter_map(|vals| {
+            let (idx, val) = vals.first()?;
+            let len = vals.len();
+            Some((*idx, len, (*val).clone()))
         })
         .collect::<Vec<_>>();
-    empty_blocks.sort();
-    let vals = ori_vals.iter().enumerate().collect::<Vec<_>>();
-    let chunks = vals
-        .chunk_by(|a, b| a.1 == b.1)
-        .collect::<Vec<_>>()
+    let (mut files, mut empties): (Vec<_>, Vec<_>) = input
         .into_iter()
-        .skip(1)
-        .rev()
-        .filter(|x| !matches!(x.first().map(|x| x.1), Some(Val::Empty)));
-    let mut new_vals = Vec::new();
-    for chunk in chunks {
-        let mut chunk_len = chunk.len();
-        let (chunk_idx, Val::Val(val)) = chunk.first().unwrap() else {
-            panic!()
-        };
-        let (mut chunk_idx, val) = (*chunk_idx, *val);
-        let Some((idx, (block_idx, block_len))) =
-            empty_blocks
-                .iter()
-                .copied()
-                .enumerate()
-                .find(|(_idx, (block_idx, block_len))| {
-                    *block_len >= chunk_len && *block_idx < chunk_idx
-                })
+        .partition(|(_, _, val)| !matches!(val, Val::Empty));
+
+    for (file_idx, file_len, _) in files.iter_mut().rev() {
+        let Some((empty_idx, empty_len, _)) = empties
+            .iter_mut()
+            .find(|(empty_idx, empty_len, _)| empty_idx < file_idx && empty_len >= file_len)
         else {
             continue;
         };
-        new_vals.push((block_idx, chunk_len, val));
-        empty_blocks.remove(idx);
-        if block_len - chunk_len > 0 {
-            empty_blocks.insert(idx, (block_idx + chunk_len, block_len - chunk_len));
-        }
-
-        let mut extended = false;
-
-        if let Some((idx, len)) = empty_blocks
-            .iter_mut()
-            .find(|(idx, len)| (*idx..=*idx + *len).contains(&chunk_idx))
-        {
-            extended = true;
-            *len += chunk_len;
-            chunk_len = *len;
-            chunk_idx = *idx;
-        }
-
-        if let Some((idx, (a_idx, a_len))) =
-            empty_blocks
-                .iter()
-                .copied()
-                .enumerate()
-                .find(|(_, (idx, _len))| {
-                    (chunk_idx..=chunk_idx + chunk_len).contains(idx) && *idx != chunk_idx
-                })
-        {
-            extended = true;
-            if let Some(x) = empty_blocks.get_mut(idx - 1) {
-                if x.0 == chunk_idx {
-                    x.1 += a_len;
-                    empty_blocks.remove(idx);
-                }
-            } else {
-                empty_blocks.remove(idx);
-                empty_blocks.insert(idx, (chunk_idx, chunk_len + a_len));
-            }
-        }
-        if !extended {
-            empty_blocks.push((chunk_idx, chunk_len));
-        }
-        empty_blocks.sort();
-    }
-    for (idx, len) in empty_blocks {
-        for x in ori_vals.get_mut(idx..idx + len).unwrap() {
-            *x = Val::Empty;
-        }
-    }
-    for (idx, len, val) in new_vals {
-        for x in ori_vals.get_mut(idx..idx + len).unwrap() {
-            *x = Val::Val(val);
-        }
+        *file_idx = *empty_idx;
+        *empty_idx = *file_idx + *file_len;
+        *empty_len -= *file_len;
     }
 
-    let total: usize = ori_vals
-        .iter()
-        .enumerate()
-        .filter_map(|(idx, val)| {
-            if let Val::Val(val) = val {
-                Some(idx * (*val))
-            } else {
-                None
-            }
+    let total: usize = files
+        .into_iter()
+        .map(|(idx, len, val)| {
+            let Val::Val(val) = val else { unreachable!() };
+            (idx..idx + len).map(|i| i * val).sum::<usize>()
         })
         .sum();
-    println!("DAY9 PART2: {total}");
+
+    println!("DAY9 PART2 {total}");
+
     total
 }
 
@@ -196,7 +126,6 @@ fn get_input(input: &str) -> Vec<Val> {
 }
 
 const INPUT: &str = include_encrypted_string!("inputs/day9.enc");
-const EXAMPLE: &str = "2333133121414131402";
 
 #[cfg(test)]
 mod tests {
