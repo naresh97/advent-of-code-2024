@@ -9,20 +9,16 @@ pub fn day11() {
 
 fn part1() -> usize {
     let input = get_input(INPUT);
-    let total = input
-        .iter()
-        .map(|num| blink(*num, 0, 25, &mut HashMap::new()))
-        .sum();
+    let mut cache = HashMap::new();
+    let total = input.iter().map(|num| blink(*num, 0, 25, &mut cache)).sum();
     println!("DAY11 PART1: {total}");
     total
 }
 
 fn part2() -> usize {
     let input = get_input(INPUT);
-    let total = input
-        .iter()
-        .map(|num| blink(*num, 0, 75, &mut HashMap::new()))
-        .sum();
+    let mut cache = HashMap::new();
+    let total = input.iter().map(|num| blink(*num, 0, 75, &mut cache)).sum();
     println!("DAY11 PART2: {total}");
     total
 }
