@@ -10,6 +10,7 @@ use day07::day7;
 use day08::day8;
 use day09::day9;
 use day10::day10;
+use day11::day11;
 
 mod day01;
 mod day02;
@@ -21,6 +22,7 @@ mod day07;
 mod day08;
 mod day09;
 mod day10;
+mod day11;
 
 fn main() {
     time_run(day1);
@@ -33,6 +35,7 @@ fn main() {
     time_run(day8);
     time_run(day9);
     time_run(day10);
+    time_run(day11);
 }
 
 fn time_run(f: impl Fn()) {
